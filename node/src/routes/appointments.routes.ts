@@ -2,10 +2,14 @@ import { Router } from 'express';
 import { parseISO } from 'date-fns';
 
 import { getCustomRepository } from 'typeorm';
+
+import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 import AppointmentsRepository from '../repositories/AppointmentsRepository';
 import CreateAppointmentService from '../services/CreateAppointmentService';
 
 const appointmentsRouter = Router();
+
+appointmentsRouter.use(ensureAuthenticated);
 
 appointmentsRouter.get('/', async (request, response) => {
   const appointmentsRepository = getCustomRepository(AppointmentsRepository);
@@ -16,6 +20,7 @@ appointmentsRouter.get('/', async (request, response) => {
 
 appointmentsRouter.post('/', async (request, response) => {
   try {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     const { provider_id, date } = request.body;
 
     const parsedDate = parseISO(date);
@@ -24,6 +29,7 @@ appointmentsRouter.post('/', async (request, response) => {
 
     const appointment = await createAppointment.execute({
       date: parsedDate,
+      // eslint-disable-next-line @typescript-eslint/camelcase
       provider_id,
     });
 
